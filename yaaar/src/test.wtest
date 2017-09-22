@@ -1,0 +1,122 @@
+import yaaar.*
+import misiones.*
+import piratas.*
+
+//1
+test "Saber si un pirata es util para una mision"{
+	var barbanegra = new Pirata(["brujula", "cuchillo", "cuchillo", "dienteDeOro", "grogXD", "grogXD", "grogXD"],1,1)
+	var misionTesoro = new BusquedaDelTesoro()
+	assert.that(misionTesoro.esUtil(barbanegra))
+}
+
+//2
+test "Saber si un pirata puede formar parte de la tripulación de un barco. Esto ocurre cuando el barco tiene lugar para un tripulante más, y además el pirata sirve para la misión del barco"{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var misionTesoro = new BusquedaDelTesoro()
+	var perlaNegra = new BarcoPirata(misionTesoro, [], 3)
+	assert.that(perlaNegra.tieneLugar(jackSparrow))
+}
+
+test "Incorporar un pirata a la tripulación de un barco, sólo si esto puede ser llevado a cabo"{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var capitanGarfio = new Pirata(["mapa"],0,2)
+	var misionTesoro = new BusquedaDelTesoro()
+	var perlaNegra = new BarcoPirata(misionTesoro, [capitanGarfio], 3)
+	perlaNegra.incorporar(jackSparrow)
+	assert.equals([capitanGarfio, jackSparrow], perlaNegra.tripulantes())
+}
+
+test "Hacer que un barco cambie de 	misión. Al cambiar de misión, el barco echa a los tripulantes que no sirven para su misión actual"{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var capitanGarfio = new Pirata(["mapa"],0,2)
+	var misionTesoro = new BusquedaDelTesoro()
+	var misionLeyenda = new ConvertirseEnLeyenda("grogXD")
+	var perlaNegra = new BarcoPirata(misionTesoro, [capitanGarfio,jackSparrow], 3)
+	perlaNegra.mision(misionLeyenda)
+	assert.equals([jackSparrow], perlaNegra.tripulantes())
+}
+
+//3
+test "Saber quién es el pirata más ebrio de la tripulación de un barco."{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var capitanGarfio = new Pirata(["mapa"],0,2)
+	var misionTesoro = new BusquedaDelTesoro()
+	var perlaNegra = new BarcoPirata(misionTesoro, [capitanGarfio,jackSparrow], 3)
+	assert.equals(jackSparrow, perlaNegra.masEbrio())
+}
+
+test "Hacer que un barco ancle en una ciudad costera"{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var capitanGarfio = new Pirata(["mapa"],0,2)
+	var misionTesoro = new BusquedaDelTesoro()
+	var perlaNegra = new BarcoPirata(misionTesoro, [capitanGarfio,jackSparrow], 3)
+	var coastCity = new CiudadCostera(0)
+	perlaNegra.anclar(coastCity)
+	assert.equals(5, capitanGarfio.nivelDeEbriedad())
+	assert.equals([capitanGarfio], perlaNegra.tripulantes())	
+	assert.equals(1, coastCity.habitantes())
+}
+
+//4
+test "Saber si un barco pirata es temible."{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var capitanGarfio = new Pirata(["mapa"],0,2)
+	var guybrush = new Pirata(["llaveDeTesoro", "mapa"],3,3)
+	var misionTesoro = new BusquedaDelTesoro()
+	var perlaNegra = new BarcoPirata(misionTesoro, [capitanGarfio,jackSparrow,guybrush], 3)
+	assert.that(perlaNegra.temible())
+}
+
+/*test "Se sabe que algunos tripulantes son espías de la corona"{
+	var davyJones = new EspiaDeLaCorona(["permisoDeLaCorona"],2,2)
+	var misionSaqueo = new Saqueo(persona,5)
+	var holandesErrante = new BarcoPirata(misionSaqueo,[davyJones],2)
+	
+	assert.that()
+}*/
+
+//5
+test "Saber cuántos tripulantes de un barco están pasados de grogXD"{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var capitanGarfio = new Pirata(["mapa"],0,2)
+	var guybrush = new Pirata(["llaveDeTesoro", "mapa"],3,3)
+	var capitanMorgan = new Pirata(["grogXD"],91,3)
+	var misionTesoro = new BusquedaDelTesoro()
+	var perlaNegra = new BarcoPirata(misionTesoro, [capitanGarfio,jackSparrow,guybrush,capitanMorgan], 3)
+	assert.equals(1, perlaNegra.pasadosDeGrog().size())
+}
+
+test "Saber cuántos tipos distintos de items se juntan entre los tripulantes de un barco que están pasados de grogXD"{
+	var jackSparrow = new Pirata(["brujula","brujula","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD","grogXD"],2,2)
+	var capitanGarfio = new Pirata(["mapa"],0,2)
+	var guybrush = new Pirata(["llaveDeTesoro", "mapa"],3,3)
+	var capitanMorgan = new Pirata(["grogXD"],91,3)
+	var capitanFlint = new Pirata(["mapa","grogXD"],92,3)
+	var misionTesoro = new BusquedaDelTesoro()
+	var perlaNegra = new BarcoPirata(misionTesoro, [capitanGarfio,jackSparrow,guybrush,capitanMorgan,capitanFlint], 3)
+	perlaNegra.juntarItemsDeLosPasados()
+	assert.equals(2, perlaNegra.itemsDeTripulantes().size())
+}
+
+test "Obtener el tripulante pasado de grogXD con más dinero de la tripulación de un barco."{
+	var capitanMorgan = new Pirata(["grogXD"],91,3)
+	var barbosa = new Pirata(["grogXD"],93,1)
+	var misionTesoro = new BusquedaDelTesoro()
+	var nautilus = new BarcoPirata(misionTesoro, [capitanMorgan, barbosa], 3)
+	assert.equals(capitanMorgan, nautilus.elPasadoConMasPlata())
+}
+
+//6
+test "Se quiere conocer quién es el tripulante de un barco pirata que invitó (satisfactoriamente) a más gente."{
+	var luffy = new Pirata(["mapa"],1,1)
+	var nami = new Pirata(["mapa"],1,1)
+	var zoro = new Pirata(["mapa"],1,1)
+	var sanji = new Pirata(["mapa"],1,1)
+	var usop = new Pirata(["mapa"],1,1)
+	var misionTesoro = new BusquedaDelTesoro()
+	var goingMerry = new BarcoPirata(misionTesoro,[luffy,nami],8)
+	luffy.invitar(zoro, goingMerry)
+	luffy.invitar(sanji, goingMerry)
+	nami.invitar(usop, goingMerry)
+	assert.equals(luffy, goingMerry.elQueMasInvito())
+}
